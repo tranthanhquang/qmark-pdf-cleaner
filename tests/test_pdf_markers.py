@@ -156,7 +156,8 @@ def test_ocr_finds_scan_attribution_and_maps_coordinates(tmp_path, monkeypatch):
     document.save(source)
     document.close()
 
-    textpage = object()
+    low_resolution_textpage = object()
+    high_resolution_textpage = object()
     words = [
         (10, 325, 57.5, 334, "Scanned", 1, 1, 0),
         (60, 337, 80, 346, "with", 1, 2, 0),
@@ -170,16 +171,23 @@ def test_ocr_finds_scan_attribution_and_maps_coordinates(tmp_path, monkeypatch):
         lambda path: str(path) == "/opt/homebrew/share/tessdata"
         or original_is_dir(path),
     )
-    ocr_options = {}
+    ocr_options = []
 
     def get_textpage_ocr(page, **kwargs):
-        ocr_options.update(kwargs)
-        return textpage
+        ocr_options.append(kwargs)
+        return (
+            high_resolution_textpage
+            if kwargs["dpi"] == 400
+            else low_resolution_textpage
+        )
 
     monkeypatch.setattr(fitz.Page, "get_textpage_ocr", get_textpage_ocr)
 
     def get_text(page, option, *args, **kwargs):
-        if kwargs.get("textpage") is textpage:
+        textpage = kwargs.get("textpage")
+        if textpage is low_resolution_textpage:
+            return []
+        if textpage is high_resolution_textpage:
             return words
         return original_get_text(page, option, *args, **kwargs)
 
@@ -192,7 +200,11 @@ def test_ocr_finds_scan_attribution_and_maps_coordinates(tmp_path, monkeypatch):
     assert result.pages[0].candidates[0].bounds == pytest.approx(
         (0.0, 309.7, 135.0, 374.3)
     )
-    assert ocr_options["tessdata"] == "/opt/homebrew/share/tessdata"
+    assert [options["dpi"] for options in ocr_options] == [200, 400]
+    assert all(
+        options["tessdata"] == "/opt/homebrew/share/tessdata"
+        for options in ocr_options
+    )
 
 
 def test_scanned_pdf_reports_unavailable_ocr(tmp_path, monkeypatch):

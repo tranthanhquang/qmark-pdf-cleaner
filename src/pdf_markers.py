@@ -170,16 +170,20 @@ def _ocr_mark(page: fitz.Page) -> list[MarkCandidate]:
             ),
             None,
         )
-        textpage = page.get_textpage_ocr(
-            language="eng", dpi=200, full=True, tessdata=tessdata
-        )
-        lines = _pdf_text_lines(page, textpage)
+        for dpi in (200, 400):
+            textpage = page.get_textpage_ocr(
+                language="eng", dpi=dpi, full=True, tessdata=tessdata
+            )
+            candidates = _marker_lines(_pdf_text_lines(page, textpage), page, "ocr")
+            if candidates:
+                return candidates
     except Exception as exc:
         raise OCRUnavailableError(
-            "Local OCR could not read this scanned page. Install English OCR language data "
+            "Local OCR could not read this scanned page. "
+            "Install English OCR language data "
             "and make sure the local OCR engine is configured."
         ) from exc
-    return _marker_lines(lines, page, "ocr")
+    return []
 
 
 def _pdf_text_lines(
