@@ -1,20 +1,20 @@
 # QMark PDF Cleaner
 
-Ứng dụng desktop QMark xử lý PDF cục bộ, cho xem trước và xóa dấu scan theo từng trang. Phiên bản hiện tại nhận diện wordmark `CamScanner` làm dấu mẫu; logo không có chữ sẽ chưa được hỗ trợ.
+QMark is a local desktop app for reviewing and removing scan marks from PDF pages. The current version detects the `CamScanner` wordmark. Logo-only marks without readable text are not supported.
 
-## Yêu cầu
+## Requirements
 
 - Python 3.12
 - Tkinter
-- Tesseract OCR được cài cục bộ để xử lý các trang PDF dạng ảnh/scan
+- Tesseract OCR installed locally to process scanned/image-only pages
 
-Trên macOS dùng Homebrew, cài các thành phần cần thiết bằng lệnh:
+On macOS with Homebrew, install the local runtime components with:
 
 ```bash
 brew install python-tk@3.12 tesseract
 ```
 
-## Chạy ứng dụng
+## Run
 
 ```bash
 python3.12 -m venv .venv
@@ -23,21 +23,21 @@ python -m pip install -r requirements.txt
 python -m src
 ```
 
-## Chạy kiểm tra tự động
+## Run automated checks
 
 ```bash
 python -m pip install -r requirements-dev.txt
 python -m pytest
 ```
 
-Nhận diện chữ và OCR đều chạy trên thiết bị; ứng dụng không gửi nội dung PDF đến dịch vụ bên ngoài. Tệp nguồn không bị ghi đè: hãy chọn đường dẫn riêng để lưu kết quả. Vùng dấu bị xóa sẽ được thay bằng nền trắng; nội dung bị dấu che không được khôi phục.
+Text detection and OCR run on the user's device; the app does not send PDF content to an external service. The source PDF is never overwritten; save the result to a separate path. Removed regions are replaced with a white background, and content hidden beneath the mark is not reconstructed.
 
-## Giấy phép
+## License
 
-Dự án này được cấp phép theo GNU Affero General Public License phiên bản 3 (`AGPL-3.0-only`); xem nội dung đầy đủ trong `LICENSE`. Dự án chọn nhánh AGPL của PyMuPDF. Nếu muốn phân phối ứng dụng theo giấy phép khác hoặc đóng mã nguồn, cần thay PyMuPDF bằng thư viện phù hợp hoặc xin giấy phép thương mại từ Artifex trước khi phân phối. Xem [điều khoản PyMuPDF](https://pymupdf.readthedocs.io/en/latest/about.html#license-and-copyright).
+This project is licensed under the GNU Affero General Public License v3 (`AGPL-3.0-only`); see [`LICENSE`](LICENSE) for the full text. The project uses PyMuPDF under its AGPL option. If you need to distribute the app under different terms or keep it closed source, replace PyMuPDF with a suitable library or obtain a commercial license from Artifex before distribution. See the [PyMuPDF licensing terms](https://pymupdf.readthedocs.io/en/latest/about.html#license-and-copyright).
 
-## Trạng thái kiểm chứng
+## Validation status
 
-Cả 10 kiểm tra tự động đều đạt. Các kiểm tra bao gồm nhận diện chữ nhúng trong PDF với các cách viết xung quanh khác nhau, xóa toàn bộ block marker có khung, lựa chọn giữ/xóa theo trang, bảo toàn tệp nguồn và trang, quy đổi tọa độ OCR bằng dữ liệu OCR mô phỏng, xử lý tệp không hợp lệ và thông báo khi thiếu Tesseract. Trong quá trình triển khai chưa có Tesseract và PDF CamScanner mẫu, nên chưa xác minh OCR trên bản scan thực tế hoặc mục tiêu nhận diện 95%.
+All 10 automated checks pass. They cover embedded-text detection with different surrounding wording, full framed-mark removal, per-page keep/remove choices, source and page preservation, OCR coordinate conversion with simulated OCR output, invalid input, and the missing-Tesseract error. Tesseract and representative CamScanner PDFs were not available during implementation, so OCR accuracy on real scans and the 95% detection target have not been verified.
 
-Mã nguồn ứng dụng không có HTTP client hoặc lời gọi dịch vụ bên ngoài. Việc xử lý PDF và OCR chỉ sử dụng tệp cục bộ và chương trình chạy trên thiết bị.
+The application source contains no HTTP client or external service calls. PDF processing and OCR use local files and local executables only.
