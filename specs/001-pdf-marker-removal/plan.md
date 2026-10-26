@@ -6,31 +6,31 @@
 
 ## Summary
 
-Build a small desktop tool that processes PDFs entirely on the user's device. It finds readable "CamScanner" wordmark text through embedded text and local OCR for image-only pages, previews affected pages, and lets the user remove or retain the mark page by page. Removal blanks the selected mark region; it does not reconstruct content hidden beneath the mark.
+Build a small desktop tool that processes PDFs entirely on the user's device. It finds readable scan attribution labels through embedded text and local OCR for image-only pages, previews affected pages, and lets the user remove or retain the mark page by page. Removal blanks the selected mark region; it does not reconstruct content hidden beneath the mark.
 
 ## Technical Context
 
 **Language/Version**: Python 3.12
 
-**Primary Dependencies**: PyMuPDF for PDF text search, rendering, and redaction; Tesseract OCR for image-only pages; Python Tkinter for the local desktop interface
+**Primary Dependencies**: PyMuPDF for PDF text search, rendering, and redaction; local OCR for image-only pages; Python Tkinter for the local desktop interface
 
 **Storage**: User-selected source and destination PDF files only; temporary page images stay local and are removed when the session ends
 
 **Testing**: pytest with text-based and scanned PDF fixtures; manually inspect page previews and output PDFs
 
-**Target Platform**: Desktop environments with Python and Tesseract installed; initial implementation should validate macOS, with other platforms considered if setup remains straightforward
+**Target Platform**: Desktop environments with Python and a local OCR engine installed; initial implementation should validate macOS, with other platforms considered if setup remains straightforward
 
 **Project Type**: Desktop application
 
 **Performance Goals**: A 20-page representative PDF should become reviewable within 30 seconds on a typical current laptop
 
-**Constraints**: No PDF content leaves the device. Never overwrite the source. Only remove the fixed CamScanner mark. Redaction replaces the marked region and cannot restore background pixels or obscured content. Confirm PyMuPDF licensing terms before distributing the tool.
+**Constraints**: No PDF content leaves the device. Never overwrite the source. Only remove supported scan attribution marks. Redaction replaces the marked region and cannot restore background pixels or obscured content. Confirm PyMuPDF licensing terms before distributing the tool.
 
 **Scale/Scope**: One local user processes one PDF at a time; no accounts, server, cloud storage, or arbitrary marker configuration
 
 ## Constitution Check
 
-The repository constitution contains template placeholders rather than ratified project principles, so it defines no enforceable gates. This plan follows the feature's explicit constraints: local processing, a separate output file, user review, and narrow CamScanner-only scope.
+The repository constitution contains template placeholders rather than ratified project principles, so it defines no enforceable gates. This plan follows the feature's explicit constraints: local processing, a separate output file, user review, and narrow scan attribution-only scope.
 
 **Gate**: Pass. No constitution violations identified.
 

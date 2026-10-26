@@ -12,7 +12,7 @@
 
 ## Page Review
 
-- **Purpose**: Holds candidate occurrences of the CamScanner wordmark and the user's decision for one source page.
+- **Purpose**: Holds candidate occurrences of a scan attribution label and the user's decision for one source page.
 - **Fields**:
   - Source page number
   - Candidate mark regions, each represented by page-relative bounds and detection source (embedded text or OCR)
@@ -26,4 +26,4 @@
   - Destination path
   - Page count and order corresponding to the source
   - Set of page regions removed
-- **Rules**: The source remains unchanged. Pages marked keep retain their CamScanner mark. Removed regions may have a blank background; hidden content is not reconstructed.
+- **Rules**: The source remains unchanged. Pages marked keep retain their scan attribution mark. Removed regions may have a blank background; hidden content is not reconstructed.

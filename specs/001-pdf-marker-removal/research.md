@@ -9,13 +9,13 @@
 - **License**: PyMuPDF is offered under AGPL or commercial terms. Confirm the applicable terms before distribution.
 - **Sources**: [PyMuPDF page operations](https://pymupdf.readthedocs.io/en/latest/page.html#page-search-for), [PyMuPDF redactions](https://pymupdf.readthedocs.io/en/latest/page.html#page-apply-redactions), [PyMuPDF license](https://pymupdf.readthedocs.io/en/latest/about.html#license-and-copyright)
 
-## Decision 2: Use local Tesseract OCR only as fallback for image-only pages
+## Decision 2: Use PyMuPDF local OCR only as fallback for image-only pages
 
-- **Decision**: Search embedded PDF text first. For image-only pages, render locally and use Tesseract OCR to find the fixed CamScanner text mark. Do not use OCR to alter the page automatically without review.
-- **Rationale**: Tesseract is a local OCR engine and can return recognized text with positions. This avoids sending document content to a service and allows the UI to highlight candidate regions.
+- **Decision**: Search embedded PDF text first. For image-only pages, use PyMuPDF's local OCR API to find scan attribution labels. Do not use OCR to alter the page automatically without review.
+- **Rationale**: The PyMuPDF OCR API returns recognized text with positions and keeps document processing local, allowing the UI to highlight candidate regions without sending content to a service.
 - **Alternatives considered**: Supporting text-based PDFs only would exclude scanned pages explicitly in scope. A remote OCR service violates the local-processing requirement. Computer-vision matching for logo-only variants is deferred until representative samples justify it.
 - **Limit**: OCR can miss or misplace text, and it cannot determine whether content under a mark is important. Detection accuracy must be measured against representative, authorized sample PDFs.
-- **Sources**: [Tesseract command-line usage](https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html)
+- **Sources**: [PyMuPDF OCR documentation](https://pymupdf.readthedocs.io/en/latest/page.html#Page.get_textpage_ocr)
 
 ## Decision 3: Use a local desktop interface
 

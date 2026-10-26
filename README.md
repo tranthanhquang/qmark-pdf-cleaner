@@ -1,17 +1,18 @@
 # QMark PDF Cleaner
 
-QMark is a local desktop app for reviewing and removing scan marks from PDF pages. The current version detects the `CamScanner` wordmark. Logo-only marks without readable text are not supported.
+QMark is a local desktop app for reviewing and removing scan attribution marks from PDF pages. It detects readable `Scanned with` and `Scanned by` labels. Logo-only marks without readable text are not supported.
 
 ## Requirements
 
 - Python 3.12
 - Tkinter
-- Tesseract OCR installed locally to process scanned/image-only pages
+- PyMuPDF and Pillow (installed from `requirements.txt`)
+- A local OCR engine for scanned/image-only pages; install and configure one supported by PyMuPDF for your platform
 
-On macOS with Homebrew, install the local runtime components with:
+On macOS with Homebrew, install Python and Tkinter with:
 
 ```bash
-brew install python-tk@3.12 tesseract
+brew install python-tk@3.12
 ```
 
 ## Run
@@ -38,6 +39,6 @@ This project is licensed under the GNU Affero General Public License v3 (`AGPL-3
 
 ## Validation status
 
-All 10 automated checks pass. They cover embedded-text detection with different surrounding wording, full framed-mark removal, per-page keep/remove choices, source and page preservation, OCR coordinate conversion with simulated OCR output, invalid input, and the missing-Tesseract error. Tesseract and representative CamScanner PDFs were not available during implementation, so OCR accuracy on real scans and the 95% detection target have not been verified.
+Automated checks cover embedded-text detection, framed-mark removal, per-page keep/remove choices, source and page preservation, OCR coordinate handling with simulated output, and invalid input. Real OCR accuracy has not been verified against a representative set of scanned PDFs.
 
-The application source contains no HTTP client or external service calls. PDF processing and OCR use local files and local executables only.
+The application source contains no HTTP client or external service calls. PDF processing and OCR use local files and local software only.

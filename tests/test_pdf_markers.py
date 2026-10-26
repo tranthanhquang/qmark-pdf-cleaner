@@ -2,7 +2,6 @@ from io import BytesIO
 
 import fitz
 from PIL import Image
-import pytesseract
 import pytest
 
 from src.pdf_markers import (
@@ -17,7 +16,7 @@ def make_text_pdf(path):
     document = fitz.open()
     marked = document.new_page(width=300, height=400)
     marked.insert_text((30, 80), "Report content")
-    marked.insert_text((30, 370), "Scanned by CamScanner")
+    marked.insert_text((30, 370), "Scanned by QMark")
     unmarked = document.new_page(width=300, height=400)
     unmarked.insert_text((30, 80), "Unmarked page")
     document.save(path)
@@ -40,7 +39,7 @@ def test_scan_and_save_selected_mark_preserves_source_and_pages(tmp_path):
     assert source.read_bytes() == original
     cleaned = fitz.open(destination)
     assert cleaned.page_count == 2
-    assert "Scanned by CamScanner" not in cleaned[0].get_text()
+    assert "Scanned by QMark" not in cleaned[0].get_text()
     assert "Report content" in cleaned[0].get_text()
     assert "Unmarked page" in cleaned[1].get_text()
     cleaned.close()
@@ -56,14 +55,14 @@ def test_keep_choice_retains_mark(tmp_path):
     save_cleaned_pdf(result, destination)
 
     cleaned = fitz.open(destination)
-    assert "Scanned by CamScanner" in cleaned[0].get_text()
+    assert "Scanned by QMark" in cleaned[0].get_text()
     cleaned.close()
 
 
-def test_text_detection_accepts_other_cam_scanner_wording(tmp_path):
+def test_text_detection_accepts_scan_attribution_wording(tmp_path):
     source = tmp_path / "variant.pdf"
     document = fitz.open()
-    document.new_page().insert_text((30, 80), "Scanned with CamScanner")
+    document.new_page().insert_text((30, 80), "Scanned with QMark")
     document.save(source)
     document.close()
 
@@ -80,7 +79,7 @@ def test_removal_covers_surrounding_marker_block(tmp_path):
     frame = fitz.Rect(40, 40, 200, 105)
     page.draw_rect(frame, color=(0.4, 0.4, 0.4), dashes=".[3 2]")
     page.insert_text((60, 65), "Scanned with")
-    page.insert_text((60, 90), "CamScanner")
+    page.insert_text((60, 90), "QMark")
     document.save(source)
     document.close()
 
@@ -90,7 +89,7 @@ def test_removal_covers_surrounding_marker_block(tmp_path):
 
     cleaned = fitz.open(destination)
     assert "Scanned with" not in cleaned[0].get_text()
-    assert "CamScanner" not in cleaned[0].get_text()
+    assert "QMark" not in cleaned[0].get_text()
     cleaned.close()
 
 
@@ -146,7 +145,7 @@ def test_non_pdf_file_is_rejected(tmp_path):
         scan_pdf(source)
 
 
-def test_ocr_finds_fixed_mark_and_maps_coordinates(tmp_path, monkeypatch):
+def test_ocr_finds_scan_attribution_and_maps_coordinates(tmp_path, monkeypatch):
     image_bytes = BytesIO()
     Image.new("RGB", (600, 800), "white").save(image_bytes, format="PNG")
     source = tmp_path / "scan.pdf"
@@ -156,21 +155,21 @@ def test_ocr_finds_fixed_mark_and_maps_coordinates(tmp_path, monkeypatch):
     document.save(source)
     document.close()
 
-    monkeypatch.setattr(
-        pytesseract,
-        "image_to_data",
-        lambda *args, **kwargs: {
-            "text": ["Scanned", "with", "CamScanner"],
-            "conf": ["90", "92", "93"],
-            "left": [20, 90, 120],
-            "top": [650, 650, 700],
-            "width": [65, 25, 100],
-            "height": [18, 18, 18],
-            "block_num": [1, 1, 1],
-            "par_num": [1, 1, 1],
-            "line_num": [1, 1, 2],
-        },
-    )
+    textpage = object()
+    words = [
+        (10, 325, 57.5, 334, "Scanned", 1, 1, 0),
+        (60, 325, 80, 334, "with", 1, 1, 1),
+        (60, 350, 110, 359, "QMark", 1, 2, 0),
+    ]
+    original_get_text = fitz.Page.get_text
+    monkeypatch.setattr(fitz.Page, "get_textpage_ocr", lambda *args, **kwargs: textpage)
+
+    def get_text(page, option, *args, **kwargs):
+        if kwargs.get("textpage") is textpage:
+            return words
+        return original_get_text(page, option, *args, **kwargs)
+
+    monkeypatch.setattr(fitz.Page, "get_text", get_text)
 
     result = scan_pdf(source)
 
@@ -181,7 +180,7 @@ def test_ocr_finds_fixed_mark_and_maps_coordinates(tmp_path, monkeypatch):
     )
 
 
-def test_scanned_pdf_reports_missing_tesseract(tmp_path, monkeypatch):
+def test_scanned_pdf_reports_unavailable_ocr(tmp_path, monkeypatch):
     image_bytes = BytesIO()
     Image.new("RGB", (100, 100), "white").save(image_bytes, format="PNG")
     source = tmp_path / "scan.pdf"
@@ -191,10 +190,10 @@ def test_scanned_pdf_reports_missing_tesseract(tmp_path, monkeypatch):
     document.save(source)
     document.close()
 
-    def no_tesseract(*args, **kwargs):
-        raise pytesseract.pytesseract.TesseractNotFoundError()
+    def unavailable_ocr(*args, **kwargs):
+        raise RuntimeError("OCR is unavailable")
 
-    monkeypatch.setattr(pytesseract, "image_to_data", no_tesseract)
+    monkeypatch.setattr(fitz.Page, "get_textpage_ocr", unavailable_ocr)
 
-    with pytest.raises(OCRUnavailableError, match="Install it locally"):
+    with pytest.raises(OCRUnavailableError, match="Local OCR support is unavailable"):
         scan_pdf(source)

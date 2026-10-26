@@ -5,8 +5,8 @@ This guide describes the end-to-end checks for the local desktop tool.
 ## Prerequisites
 
 - Python 3.12
-- Tesseract installed and available locally for image-only pages
-- An authorized text-based PDF and an authorized scanned PDF containing readable CamScanner wordmark text
+- A local OCR engine supported by PyMuPDF for image-only pages
+- An authorized text-based PDF and an authorized scanned PDF containing a readable scan attribution label
 
 ## Setup and launch
 
@@ -29,4 +29,4 @@ python -m src
 
 For scanned samples, compare OCR candidate boxes with the visible wordmark and neighboring content. Track detection misses and false matches against a representative authorized sample set before claiming the 95% success target.
 
-Automated checks cover embedded text, redaction, source preservation, per-page keep decisions, and OCR coordinate handling with simulated OCR output. They do not replace validation with Tesseract installed and representative scanned CamScanner samples.
+Automated checks cover embedded text, redaction, source preservation, per-page keep decisions, and OCR coordinate handling with simulated OCR output. They do not replace validation with a local OCR engine and representative scanned PDFs.

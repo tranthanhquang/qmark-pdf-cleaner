@@ -1,4 +1,4 @@
-"""Tkinter desktop workflow for local CamScanner mark removal."""
+"""Tkinter desktop workflow for local scan-marker removal."""
 
 from __future__ import annotations
 

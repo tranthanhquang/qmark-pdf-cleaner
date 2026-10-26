@@ -10,8 +10,8 @@
 
 **Purpose**: Create the minimal application scaffold and record local runtime requirements.
 
-- [x] T001 [P] Create `requirements.txt` with PyMuPDF and pytesseract runtime dependencies and `requirements-dev.txt` with pytest
-- [x] T002 [P] Create `README.md` with Python/Tesseract setup, local-only processing, and PyMuPDF license review before distribution
+- [x] T001 [P] Create `requirements.txt` with PyMuPDF runtime dependency and local OCR support and `requirements-dev.txt` with pytest
+- [x] T002 [P] Create `README.md` with Python and local OCR setup, local-only processing, and PyMuPDF license review before distribution
 - [x] T003 Create the `src/` application package and launch entry point in `src/__main__.py`
 
 ## Phase 2: Foundational
@@ -23,13 +23,13 @@
 
 **Checkpoint**: The app can open a valid PDF without modifying the source and reject invalid input before creating output.
 
-## Phase 3: User Story 1 - Remove CamScanner Mark (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Remove Scan Attribution Marks (Priority: P1) 🎯 MVP
 
-**Goal**: Find the supported fixed CamScanner mark, let the user choose which pages to clean, and save a separate PDF.
+**Goal**: Find the supported fixed scan attribution mark, let the user choose which pages to clean, and save a separate PDF.
 
 **Independent Test**: Process authorized text-based and scanned sample PDFs; confirm detected pages are reported, a no-mark PDF reports no match, and selected marks are removed in a separate output.
 
-- [x] T006 [P] [US1] Detect the supported CamScanner mark from embedded PDF text and local OCR page coordinates in `src/pdf_markers.py`
+- [x] T006 [P] [US1] Detect scan attribution labels from embedded PDF text and local OCR page coordinates in `src/pdf_markers.py`
 - [x] T007 [P] [US1] Collect PDF selection and the user's permission-to-modify confirmation in `src/app.py`
 - [x] T008 [US1] Show candidate pages with independent remove/keep choices in `src/app.py`
 - [x] T009 [US1] Redact only selected candidate regions and save the accepted result to a separate PDF in `src/pdf_markers.py`
@@ -67,7 +67,7 @@
 
 - [ ] T017 Run the scenarios in `specs/001-pdf-marker-removal/quickstart.md` and record detection results against authorized representative PDFs in `README.md`
 - [x] T018 Confirm processing makes no network requests and verify source PDFs remain unchanged across success, cancel, and failure flows in `README.md`
-- [x] T019 Confirm the supported CamScanner mark and PyMuPDF distribution license decision are documented in `README.md`
+- [x] T019 Confirm the supported scan attribution mark and PyMuPDF distribution license decision are documented in `README.md`
 
 ## Dependencies & Execution Order
 
@@ -105,4 +105,4 @@ Add US2 visual review and cancellation, then US3 preservation and failure guaran
 - Every task uses the required checkbox, sequential ID, applicable parallel/story labels, and a concrete file path.
 - No external contracts are required for this local desktop application.
 - Do not include user PDFs in the repository; use authorized local samples for manual validation.
-- T017 remains unchecked until Tesseract and representative authorized CamScanner PDFs are available for real OCR accuracy validation.
+- T017 remains unchecked until a local OCR engine and representative authorized scanned PDFs are available for real OCR accuracy validation.
