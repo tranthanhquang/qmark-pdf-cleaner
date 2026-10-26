@@ -98,7 +98,10 @@ class MarkerRemovalApp(tk.Tk):
         ]
         if not self.candidate_pages:
             self.page_label.set("No supported mark found")
-            self.status.set(f"No supported mark found in {Path(path).name}.")
+            self.status.set(
+                f"Scanned {result.page_count} pages. "
+                f"No supported mark found in {Path(path).name}."
+            )
             self.canvas.delete("all")
             messagebox.showinfo("No mark found", "No supported scan mark was found.")
             return
@@ -106,7 +109,8 @@ class MarkerRemovalApp(tk.Tk):
         self.current_candidate = 0
         self.show_current_page()
         self.status.set(
-            f"Found mark candidates on {len(self.candidate_pages)} page(s). Review before saving."
+            f"Scanned {result.page_count} pages; found mark candidates on "
+            f"{len(self.candidate_pages)} page(s). Review before saving."
         )
 
     def show_current_page(self):
@@ -124,7 +128,8 @@ class MarkerRemovalApp(tk.Tk):
         self.canvas.create_image(0, 0, anchor="nw", image=self.photo)
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         self.page_label.set(
-            f"PDF page {review.page_number} - candidate {self.current_candidate + 1} of {len(self.candidate_pages)}"
+            f"PDF page {review.page_number} of {self.result.page_count} - candidate "
+            f"{self.current_candidate + 1} of {len(self.candidate_pages)}"
         )
         self.remove_var.set(review.remove)
 
