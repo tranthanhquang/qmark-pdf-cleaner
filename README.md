@@ -7,7 +7,7 @@ QMark is a local desktop app for reviewing and removing scan attribution marks f
 - Python 3.12
 - Tkinter
 - PyMuPDF and Pillow (installed from `requirements.txt`)
-- A local OCR engine for scanned/image-only pages; install and configure one supported by PyMuPDF for your platform
+- A local OCR engine for scanned/image-only pages; the app checks common install locations, or configure the OCR data path for PyMuPDF if installed elsewhere
 
 On macOS with Homebrew, install Python and Tkinter with:
 

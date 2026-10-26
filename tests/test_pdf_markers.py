@@ -1,4 +1,5 @@
 from io import BytesIO
+from pathlib import Path
 
 import fitz
 from PIL import Image
@@ -162,7 +163,20 @@ def test_ocr_finds_scan_attribution_and_maps_coordinates(tmp_path, monkeypatch):
         (60, 350, 110, 359, "QMark", 1, 2, 0),
     ]
     original_get_text = fitz.Page.get_text
-    monkeypatch.setattr(fitz.Page, "get_textpage_ocr", lambda *args, **kwargs: textpage)
+    original_is_dir = Path.is_dir
+    monkeypatch.setattr(
+        Path,
+        "is_dir",
+        lambda path: str(path) == "/opt/homebrew/share/tessdata"
+        or original_is_dir(path),
+    )
+    ocr_options = {}
+
+    def get_textpage_ocr(page, **kwargs):
+        ocr_options.update(kwargs)
+        return textpage
+
+    monkeypatch.setattr(fitz.Page, "get_textpage_ocr", get_textpage_ocr)
 
     def get_text(page, option, *args, **kwargs):
         if kwargs.get("textpage") is textpage:
@@ -178,6 +192,7 @@ def test_ocr_finds_scan_attribution_and_maps_coordinates(tmp_path, monkeypatch):
     assert result.pages[0].candidates[0].bounds == pytest.approx(
         (0.0, 309.7, 135.0, 374.3)
     )
+    assert ocr_options["tessdata"] == "/opt/homebrew/share/tessdata"
 
 
 def test_scanned_pdf_reports_unavailable_ocr(tmp_path, monkeypatch):
@@ -195,5 +210,5 @@ def test_scanned_pdf_reports_unavailable_ocr(tmp_path, monkeypatch):
 
     monkeypatch.setattr(fitz.Page, "get_textpage_ocr", unavailable_ocr)
 
-    with pytest.raises(OCRUnavailableError, match="Local OCR support is unavailable"):
+    with pytest.raises(OCRUnavailableError, match="Install English OCR language data"):
         scan_pdf(source)

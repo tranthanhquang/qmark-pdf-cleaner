@@ -141,11 +141,26 @@ def _open_pdf(path: Path) -> fitz.Document:
 
 def _ocr_mark(page: fitz.Page) -> list[MarkCandidate]:
     try:
-        textpage = page.get_textpage_ocr(language="eng", dpi=200, full=True)
+        tessdata = next(
+            (
+                str(path)
+                for path in (
+                    Path("/opt/homebrew/share/tessdata"),
+                    Path("/usr/local/share/tessdata"),
+                    Path("/usr/share/tessdata"),
+                )
+                if path.is_dir()
+            ),
+            None,
+        )
+        textpage = page.get_textpage_ocr(
+            language="eng", dpi=200, full=True, tessdata=tessdata
+        )
         lines = _pdf_text_lines(page, textpage)
     except Exception as exc:
         raise OCRUnavailableError(
-            "Local OCR support is unavailable or could not read this scanned page."
+            "Local OCR could not read this scanned page. Install English OCR language data "
+            "and make sure the local OCR engine is configured."
         ) from exc
     return _marker_lines(lines, page, "ocr")
 
