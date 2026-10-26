@@ -201,6 +201,7 @@ def test_ocr_finds_scan_attribution_and_maps_coordinates(tmp_path, monkeypatch):
         (0.0, 309.7, 135.0, 374.3)
     )
     assert [options["dpi"] for options in ocr_options] == [200, 400]
+    assert all(options["full"] is False for options in ocr_options)
     assert all(
         options["tessdata"] == "/opt/homebrew/share/tessdata"
         for options in ocr_options

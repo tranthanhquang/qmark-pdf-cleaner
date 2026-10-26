@@ -172,7 +172,7 @@ def _ocr_mark(page: fitz.Page) -> list[MarkCandidate]:
         )
         for dpi in (200, 400):
             textpage = page.get_textpage_ocr(
-                language="eng", dpi=dpi, full=True, tessdata=tessdata
+                language="eng", dpi=dpi, full=False, tessdata=tessdata
             )
             candidates = _marker_lines(_pdf_text_lines(page, textpage), page, "ocr")
             if candidates:
