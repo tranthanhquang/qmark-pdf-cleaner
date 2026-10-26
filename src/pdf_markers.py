@@ -70,14 +70,31 @@ def _marker_lines(
 ) -> list[MarkCandidate]:
     ordered = sorted(lines)
     candidates = []
+    label_groups = []
+    consumed = set()
     for key in ordered:
+        if key in consumed:
+            continue
+        group = [key]
         words = lines[key]
         if not _contains_scan_label([word for word, _ in words]):
-            continue
-        label_bounds = _union_words(words)
+            following = (key[0], key[1], key[2] + 1)
+            if following in lines and _contains_scan_label(
+                [word for word, _ in words + lines[following]]
+            ):
+                group.append(following)
+        if _contains_scan_label(
+            [word for group_key in group for word, _ in lines[group_key]]
+        ):
+            label_groups.append(group)
+            consumed.update(group)
+
+    for group in label_groups:
+        label_words = [word for key in group for word in lines[key]]
+        label_bounds = _union_words(label_words)
         nearby = []
         for context_key in ordered:
-            if context_key == key:
+            if context_key in group:
                 continue
             context_words = lines[context_key]
             context_bounds = _union_words(context_words)

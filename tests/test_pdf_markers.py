@@ -159,8 +159,8 @@ def test_ocr_finds_scan_attribution_and_maps_coordinates(tmp_path, monkeypatch):
     textpage = object()
     words = [
         (10, 325, 57.5, 334, "Scanned", 1, 1, 0),
-        (60, 325, 80, 334, "with", 1, 1, 1),
-        (60, 350, 110, 359, "QMark", 1, 2, 0),
+        (60, 337, 80, 346, "with", 1, 2, 0),
+        (60, 350, 110, 359, "QMark", 1, 3, 0),
     ]
     original_get_text = fitz.Page.get_text
     original_is_dir = Path.is_dir
